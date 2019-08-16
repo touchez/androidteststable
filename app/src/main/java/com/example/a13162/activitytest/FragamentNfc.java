@@ -40,25 +40,11 @@ public class FragamentNfc extends Fragment {
     private Switch switch2;
     private Switch switch3;
     private ArrayAdapter<String> adapter;
-    private Runnable runnable=new Runnable(){
-         public void run(){
-             SharedPreferences pref=getContext().getSharedPreferences("nfc", MODE_PRIVATE);
-             String switch1true=pref.getString("pages/activeCheck/activeCheck?type=exsanguinate","");
-             if(Data.getnfclist().contains("pages/activeCheck/activeCheck?type=exsanguinate")&&(!switch1.isChecked()))
-             {
-                 System.out.println(switch1true);
-                 switch1.setChecked(true);
-                 /*deleteData("switch1True");*/
-             }
-            handler.postDelayed(this,100);//每一秒更新一次
-        }
-    };
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view=inflater.inflate(R.layout.fragment_nfc_layout, container, false);
-        handler.postDelayed(runnable,100);
         for (int i = 0; i < Data.getnfclist().size(); i++) {
             System.out.println(Data.getnfclist().get(i));
         }

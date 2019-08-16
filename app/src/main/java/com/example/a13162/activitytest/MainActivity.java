@@ -1,10 +1,16 @@
 package com.example.a13162.activitytest;
 
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -12,17 +18,21 @@ import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat.Builder;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
-
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.tencent.mm.opensdk.constants.ConstantsAPI;
@@ -30,7 +40,6 @@ import com.tencent.mm.opensdk.modelbase.BaseResp;
 import com.tencent.mm.opensdk.modelbiz.WXLaunchMiniProgram;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,6 +69,14 @@ public class MainActivity extends BaseNfcActivity {
 
         switch (item.getItemId()){
             case R.id.QRcode:
+                NotificationManager manager=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+                Notification notification=new Builder(getApplicationContext())
+                        .setContentTitle("共享单车")
+                        .setContentText("点击跳转")
+                        .setWhen(System.currentTimeMillis())
+                        .setSmallIcon(android.R.mipmap.sym_def_app_icon)
+                        .build();
+                manager.notify(1,notification);
                 // 创建IntentIntegrator对象
                 IntentIntegrator intentIntegrator = new IntentIntegrator(MainActivity.this);
                 //设置自定义的扫描
@@ -131,6 +148,58 @@ public class MainActivity extends BaseNfcActivity {
         {
             System.out.println(Data.getnfclist().get(i));
         }
+
+     /*   NotificationManager manager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        *//** 2、Builder->Notification
+         *  必要属性有三项
+         *  小图标，通过 setSmallIcon() 方法设置
+         *  标题，通过 setContentTitle() 方法设置
+         *  内容，通过 setContentText() 方法设置*//*
+        Intent intent = new Intent(this,jump.class);
+        PendingIntent pi = PendingIntent.getActivity(this,0,intent,PendingIntent.FLAG_UPDATE_CURRENT);
+//给通知添加点击意图
+        Notification.Builder builder = new Notification.Builder(this);
+        builder.setContentInfo("Content info")
+                .setContentText("点击跳转")//设置通知内容
+                .setContentTitle("共享单车")//设置通知标题
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher))
+                .setSmallIcon(R.mipmap.ic_launcher_round)//不能缺少的一个属性
+                .setSubText("Subtext")
+                .setTicker("滚动消息......")
+                .setWhen(System.currentTimeMillis());//设置通知时间，默认为系统发出通知的时间，通常不用设置
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("001","my_channel",NotificationManager.IMPORTANCE_DEFAULT);
+            channel.enableLights(true); //是否在桌面icon右上角展示小红点
+            channel.setLightColor(Color.GREEN); //小红点颜色
+            channel.setShowBadge(true); //是否在久按桌面图标时显示此渠道的通知
+            manager.createNotificationChannel(channel);
+            builder.setChannelId("001");
+        }
+        builder.setContentIntent(pi);
+        Notification n = builder.build();
+        manager.notify(0,n);*/
+       // builder.setContentIntent(pi);
+       /* NotificationManager manager=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+        Notification notification=new Builder(MainActivity.this)
+                .setContentTitle("共享单车")
+                .setContentText("点击跳转")
+                .setWhen(System.currentTimeMillis())
+                .setSmallIcon(android.R.mipmap.sym_def_app_icon)
+                .setDefaults(NotificationCompat.DEFAULT_ALL)
+                .build();
+        manager.notify(0,notification);
+
+        NotificationChannel channel = new NotificationChannel("1",
+                "my_channel", NotificationManager.IMPORTANCE_DEFAULT);
+        channel.enableLights(true); //是否在桌面icon右上角展示小红点
+        channel.setLightColor(Color.GREEN); //小红点颜色
+        channel.setShowBadge(true); //是否在久按桌面图标时显示此渠道的通知
+        manager.createNotificationChannel(channel);
+
+//同时，Notification.Builder需要多设置一个*/
+
+
         viewPager = (ViewPager) findViewById(R.id.vp);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
@@ -370,6 +439,31 @@ public class MainActivity extends BaseNfcActivity {
         if(xcxpath!=null){
             if(Data.getnfclist().contains(xcxpath)) {
                 System.out.println("找到了");
+
+                if(Data.getnfclist().contains("pages/index/index")&&xcxpath.equals("pages/index/index")) {
+                    NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    Notification.Builder builder = new Notification.Builder(this);
+                    builder.setContentInfo("Content info")
+                            .setContentText("点击跳转")//设置通知内容
+                            .setContentTitle("共享单车")//设置通知标题
+                            .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher))
+                            .setSmallIcon(R.drawable.bike)//不能缺少的一个属性
+                            .setSubText("Subtext")
+                            .setTicker("滚动消息......")
+                            .setWhen(System.currentTimeMillis());//设置通知时间，默认为系统发出通知的时间，通常不用设置
+
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        NotificationChannel channel = new NotificationChannel("001", "my_channel", NotificationManager.IMPORTANCE_DEFAULT);
+                        channel.enableLights(true); //是否在桌面icon右上角展示小红点
+                        channel.setLightColor(Color.GREEN); //小红点颜色
+                        channel.setShowBadge(true); //是否在久按桌面图标时显示此渠道的通知
+                        manager.createNotificationChannel(channel);
+                        builder.setChannelId("001");
+                    }
+                    //builder.setContentIntent(pi);
+                    Notification n = builder.build();
+                    manager.notify(0, n);
+                }
                 req.path = xcxpath;
                 req.miniprogramType = WXLaunchMiniProgram.Req.MINIPROGRAM_TYPE_PREVIEW;// 可选打开 开发版，体验版和正式版
                 api.sendReq(req);
@@ -383,7 +477,6 @@ public class MainActivity extends BaseNfcActivity {
        /* req.miniprogramType = WXLaunchMiniProgram.Req.MINIPROGRAM_TYPE_PREVIEW;// 可选打开 开发版，体验版和正式版
         api.sendReq(req);*/
     }
-
 
 }
 
